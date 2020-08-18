@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <form action="" class="search column">
+      <input
+        type="text"
+        placeholder="Search..."
+        id="searchInput"
+        class="search__input"
+      />
+    </form>
+    <div class="results column">
+      <div class="results__title">Results</div>
+      <ul id="resultList" class="results__list">
+        <li class="item-result">
+          <img
+            class="item-result__avatar"
+            src="https://avatars1.githubusercontent.com/u/6128107?v=4"
+            alt=""
+          />
+          <div class="item-result__center">
+            <span class="item-result__full-name">
+              vuejs/vue
+            </span>
+            <span class="item-result__description">
+              🖖 Vue.js is a progressive, incrementally-adoptable JavaScript
+              framework for building UI on the web.
+            </span>
+          </div>
+
+          <div class="item-result__stars">
+            <img class="item-result__star-img" src="star.png" />
+            170214
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <script src="main.js" defer></script>
+  </body>
+</html>
