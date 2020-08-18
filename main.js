@@ -149,7 +149,6 @@ function drowItem(repo) {
 function redrowItems() {
     var ul = document.getElementById('resultList');
     ul.innerHTML = '';
-    console.log(state.reposIds);
     state.reposIds.forEach(function (id) {
         drowItem(state.repos[id]);
     })
@@ -165,7 +164,6 @@ var onKeyup = function () {
     state.loading = true;
     githubRepositories.search(this.value, state.page, state.perPage,
         function (response) {
-            console.log(response);
             updateRepos(response.items);
         },
         function (response) { console.log('error:', response) },
@@ -180,14 +178,12 @@ function isBottomVisible(el) {
 }
 
 var onScroll = function (e) {
-    console.log(e);
     var ul = document.getElementById('resultList');
     if (isBottomVisible(ul) && state.loading === false) {
         state.page++;
         state.loading = true;
         githubRepositories.search(state.searchValue, state.page, state.perPage,
             function (response) {
-                console.log(response);
                 addRepos(response.items);
             },
             function (response) { console.log('error:', response) },
