@@ -7,7 +7,7 @@ var state = (function () {
     var reposIds = [];
     var repos = {};
     var loading = false;
-    var save = function () {
+    var saveToStorage = function () {
         var githubSearchState = JSON.stringify({
             searchValue: this.searchValue,
             page: this.page,
@@ -16,8 +16,8 @@ var state = (function () {
             repos: this.repos,
         });
         window.localStorage.setItem(storageKey, githubSearchState);
-    }
-    var load = function () {
+    };
+    var loadFromStorage = function () {
         var githubSearchStateStr = window.localStorage.getItem(storageKey);
         if (githubSearchStateStr) {
             var githubSearchState = JSON.parse(githubSearchStateStr);
@@ -28,7 +28,11 @@ var state = (function () {
             this.repos = githubSearchState.repos;
         }
         redrowItems();
-        document.getElementById('searchInput').value = state.searchValue;
+        document.getElementById('searchInput').value = this.searchValue;
+    };
+    var deleteRepos = function () {
+        this.reposIds = [];
+        this.repos = {};
     }
     return {
         searchValue: searchValue,
@@ -37,8 +41,9 @@ var state = (function () {
         reposIds: reposIds,
         repos: repos,
         loading: loading,
-        save: save,
-        load: load,
+        saveToStorage: saveToStorage,
+        loadFromStorage: loadFromStorage,
+        deleteRepos: deleteRepos,
     };
 })();
 
@@ -48,8 +53,7 @@ var addRepo = function (repo) {
 }
 var updateRepos = function (newRepos) {
     // delete items
-    state.reposIds = [];
-    state.repos = {};
+    state.deleteRepos();
     // add new items
     newRepos.forEach(function (repo) {
         if (repo && repo.id) {
@@ -57,17 +61,16 @@ var updateRepos = function (newRepos) {
         }
     });
     redrowItems();
-    state.save();
+    state.saveToStorage();
 }
 var addRepos = function (newRepos) {
-    // add new items
     newRepos.forEach(function (repo) {
         if (repo && repo.id) {
             drowItem(repo);
             addRepo(repo);
         }
     });
-    state.save();
+    state.saveToStorage();
 }
 var githubRepositories = (function () {
     var xhttp;
@@ -101,7 +104,7 @@ var githubRepositories = (function () {
     }
 })();
 
-function stargazersFormat(stargazersCount) {
+var stargazersFormat = function (stargazersCount) {
     var res = stargazersCount;
     if (+stargazersCount > 1000) {
         res = '' + Math.floor(stargazersCount / 1000) + 'K';
@@ -109,7 +112,7 @@ function stargazersFormat(stargazersCount) {
     return res;
 }
 
-function drowItem(repo) {
+var drowItem = function (repo) {
     var ul = document.getElementById('resultList');
     var li = document.createElement('li');
     var avatar = document.createElement('img');
@@ -117,7 +120,6 @@ function drowItem(repo) {
     avatar.setAttribute('src', repo.owner.avatar_url);
     avatar.setAttribute('alt', repo.owner.login);
     li.appendChild(avatar);
-    // li.appendChild(document.createTextNode(repo.id));
     var description = document.createElement('span');
     description.setAttribute('class', 'item-result__description');
     description.appendChild(document.createTextNode(repo.description));
@@ -146,7 +148,7 @@ function drowItem(repo) {
     ul.appendChild(li);
 };
 
-function redrowItems() {
+var redrowItems = function () {
     var ul = document.getElementById('resultList');
     ul.innerHTML = '';
     state.reposIds.forEach(function (id) {
@@ -154,24 +156,33 @@ function redrowItems() {
     })
 }
 
-
 var onKeyup = function () {
-    if (state.searchValue === this.value) {
+    var value = this.value.replace(/^\s+|\s+$/g, '');
+    if (state.searchValue === value) {
         return;
     }
-    state.searchValue = this.value;
+    state.searchValue = value;
+    if (value === '') {
+        state.deleteRepos();
+        redrowItems();
+        state.saveToStorage();
+        return;
+    }
     state.page = 1;
     state.loading = true;
-    githubRepositories.search(this.value, state.page, state.perPage,
+    githubRepositories.search(value, state.page, state.perPage,
         function (response) {
-            updateRepos(response.items);
+            var isActual = state.searchValue === value;
+            if (isActual) {
+                updateRepos(response.items);
+            }
         },
         function (response) { console.log('error:', response) },
         function () { state.loading = false; }
     );
 };
 
-function isBottomVisible(el) {
+var isBottomVisible = function (el) {
     var rect = el.getBoundingClientRect();
     var isBottomVisible = (rect.bottom <= window.innerHeight);
     return isBottomVisible;
@@ -195,6 +206,6 @@ var onScroll = function (e) {
 (function () {
     document.getElementById('searchInput').addEventListener('keyup', onKeyup);
     window.addEventListener('scroll', onScroll);
-    state.load();
+    state.loadFromStorage();
 })();
 
