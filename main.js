@@ -75,6 +75,22 @@ var addRepos = function (newRepos) {
 var githubRepositories = (function () {
     var xhttp;
     var url;
+    function getXmlHttp() {
+        var xmlhttp;
+        try {
+            xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (e) {
+            try {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (E) {
+                xmlhttp = false;
+            }
+        }
+        if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
+            xmlhttp = new XMLHttpRequest();
+        }
+        return xmlhttp;
+    }
     return {
         search: function (str, page, perPage, cb, cbErr, cbEnd) {
             url = 'https://api.github.com/search/repositories?q=' +
@@ -83,11 +99,7 @@ var githubRepositories = (function () {
                 '&page=' + page +
                 '&per_page=' + perPage;
 
-            if ('ActiveXObject' in window) {
-                xhttp = new ActiveXObject('Msxml2.XMLHTTP');
-            } else {
-                xhttp = new XMLHttpRequest();
-            }
+            xhttp = getXmlHttp();
 
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4) {
