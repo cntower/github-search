@@ -82,18 +82,24 @@ var githubRepositories = (function () {
                 '&sort=stars&order=desc' +
                 '&page=' + page +
                 '&per_page=' + perPage;
-            xhttp = new XMLHttpRequest();
+
+            if ('ActiveXObject' in window) {
+                xhttp = new ActiveXObject('Msxml2.XMLHTTP');
+            } else {
+                xhttp = new XMLHttpRequest();
+            }
+
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4) {
-                    if (this.status == 200) {
-                        cb(this.response);
+                    if (this.status == 200 && xhttp.responseText) {
+                        var serverResponse = JSON.parse(xhttp.responseText);
+                        cb(serverResponse);
                     } else {
-                        cbErr && cbErr(this.response);
+                        cbErr && cbErr(xhttp.responseText);
                     }
-                    cbEnd(this.response);
+                    cbEnd(xhttp.responseText);
                 }
             };
-            xhttp.responseType = 'json';
             xhttp.open(
                 'GET',
                 url,
