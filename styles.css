@@ -57,7 +57,7 @@ ul {
   margin-top: 14px;
 }
 .item-result__center {
-  display: flex;
+  display: flex 1;
   flex-direction: column;
   padding-left: 14px;
 }

@@ -102,8 +102,8 @@ var githubRepositories = (function () {
             xhttp = getXmlHttp();
 
             xhttp.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    if (this.status == 200 && xhttp.responseText) {
+                if (xhttp.readyState == 4) {
+                    if (xhttp.status == 200 && xhttp.responseText) {
                         var serverResponse = JSON.parse(xhttp.responseText);
                         cb(serverResponse);
                     } else {
@@ -138,7 +138,7 @@ var drowItem = function (repo) {
     avatar.setAttribute('src', repo.owner.avatar_url);
     avatar.setAttribute('alt', repo.owner.login);
     li.appendChild(avatar);
-    var description = document.createElement('span');
+    var description = document.createElement('div');
     description.setAttribute('class', 'item-result__description');
     description.appendChild(document.createTextNode(repo.description));
 
@@ -223,6 +223,7 @@ var onScroll = function (e) {
 
 (function () {
     document.getElementById('searchInput').addEventListener('keyup', onKeyup);
+    document.getElementById('searchInput').addEventListener('input', onKeyup);
     window.addEventListener('scroll', onScroll);
     state.loadFromStorage();
 })();
