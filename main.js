@@ -117,7 +117,7 @@ var githubRepositories = (function () {
                 url,
                 true
             );
-            xhttp.send();
+            xhttp.send(null);
         }
     }
 })();
